@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AssetInventory\Http\Controllers;
+namespace Modules\AssetInventory\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
