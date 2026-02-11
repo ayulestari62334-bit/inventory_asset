@@ -8,48 +8,64 @@ use Modules\AssetInventory\app\Models\KategoriBarang;
 
 class KategoriBarangController extends Controller
 {
-
     public function index()
     {
-        $kategori = KategoriBarang::all();
+        $kategori = KategoriBarang::orderBy('id','desc')->get();
         return view('assetinventory::kategori.index', compact('kategori'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'kode_barang'   => 'required',
             'nama_kategori' => 'required',
             'keterangan'    => 'required',
         ]);
 
+        if (KategoriBarang::where('nama_kategori',$request->nama_kategori)->exists()) {
+            return back()->with('error','Nama kategori sudah ada');
+        }
+
+        $last = KategoriBarang::orderBy('id','desc')->first();
+        $number = $last ? (int)substr($last->kode_barang,-3)+1 : 1;
+        $kode = 'KAT-'.str_pad($number,3,'0',STR_PAD_LEFT);
+
         KategoriBarang::create([
-            'kode_barang'   => $request->kode_barang,
+            'kode_barang'   => $kode,
             'nama_kategori' => $request->nama_kategori,
             'keterangan'    => $request->keterangan,
         ]);
 
-        return redirect()->back()->with('success', 'Kategori berhasil ditambahkan');
+        return back()->with('success','Kategori berhasil ditambahkan');
     }
 
     public function update(Request $request, $id)
     {
+        $kategori = KategoriBarang::findOrFail($id);
+
         $request->validate([
-            'kode_barang'   => 'required',
             'nama_kategori' => 'required',
             'keterangan'    => 'required',
         ]);
 
-        $kategori = KategoriBarang::findOrFail($id);
-        $kategori->update($request->all());
+        if (
+            KategoriBarang::where('nama_kategori',$request->nama_kategori)
+                ->where('id','!=',$id)
+                ->exists()
+        ) {
+            return back()->with('error','Nama kategori sudah digunakan');
+        }
 
-        return redirect()->back()->with('success', 'Kategori berhasil diupdate');
+        $kategori->update([
+            'nama_kategori' => $request->nama_kategori,
+            'keterangan'    => $request->keterangan,
+        ]);
+
+        return back()->with('success','Kategori berhasil diupdate');
     }
 
     public function destroy($id)
     {
         KategoriBarang::findOrFail($id)->delete();
-
-        return redirect()->back()->with('success', 'Kategori berhasil dihapus');
+        return back()->with('success','Kategori berhasil dihapus');
     }
 }

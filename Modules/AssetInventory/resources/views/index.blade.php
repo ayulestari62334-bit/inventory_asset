@@ -1,6 +1,9 @@
-@extends('layouts.app')
-
-@section('content')
-    <h1>Hello World</h1>
-    <p>Module: {!! config('assetinventory.name') !!}</p>
-@endsection
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard berhasil dibuka</h1>
+</body>
+</html>
